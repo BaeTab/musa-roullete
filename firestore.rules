@@ -1,0 +1,30 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /pickStats/{statId} {
+      allow read: if true;
+      allow create: if request.resource.data.count == 1
+        && request.resource.data.menu is string
+        && request.resource.data.menu.size() < 60;
+      allow update: if request.resource.data.count == resource.data.count + 1
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['count', 'lastPickedAt', 'typeId', 'typeName', 'categoryId', 'categoryName', 'menu']);
+      allow delete: if false;
+    }
+
+    match /pickHistory/{historyId} {
+      allow read: if true;
+      allow create: if request.resource.data.menu is string
+        && request.resource.data.menu.size() < 60
+        && request.resource.data.typeId is string
+        && request.resource.data.categoryId is string;
+      allow update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

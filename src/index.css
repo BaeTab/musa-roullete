@@ -1,0 +1,78 @@
+:root {
+  --font-body: 'Pretendard', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Jua', var(--font-body);
+
+  --bg-1: #1a1a2e;
+  --bg-2: #16213e;
+  --bg-3: #24123f;
+  --text: #f4f2ff;
+  --text-dim: rgba(244, 242, 255, 0.72);
+  --card-bg: rgba(255, 255, 255, 0.08);
+  --card-border: rgba(255, 255, 255, 0.16);
+
+  color-scheme: dark;
+  font: 16px/1.5 var(--font-body);
+  color: var(--text);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100dvh;
+}
+
+body {
+  background: linear-gradient(135deg, var(--bg-1), var(--bg-2) 55%, var(--bg-3));
+  background-size: 220% 220%;
+  animation: bg-drift 18s ease-in-out infinite;
+  overflow-x: hidden;
+}
+
+@keyframes bg-drift {
+  0% {
+    background-position: 0% 30%;
+  }
+  50% {
+    background-position: 100% 70%;
+  }
+  100% {
+    background-position: 0% 30%;
+  }
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--text);
+  margin: 0;
+}
+
+p {
+  margin: 0;
+  color: var(--text-dim);
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
