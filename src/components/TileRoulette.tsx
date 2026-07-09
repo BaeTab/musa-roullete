@@ -15,6 +15,7 @@ export interface TileRouletteHandle {
 interface TileRouletteProps {
   items: TileItem[];
   disabled?: boolean;
+  excludeIds?: string[];
   onSpinStart?: () => void;
   onSpinEnd?: (item: TileItem, index: number) => void;
 }
@@ -25,7 +26,7 @@ const MAX_DELAY = 260;
 const EASE_POWER = 2.2;
 
 const TileRoulette = forwardRef<TileRouletteHandle, TileRouletteProps>(
-  ({ items, disabled, onSpinStart, onSpinEnd }, ref) => {
+  ({ items, disabled, excludeIds, onSpinStart, onSpinEnd }, ref) => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [spinning, setSpinning] = useState(false);
     const timeoutRef = useRef<number | undefined>(undefined);
@@ -35,7 +36,11 @@ const TileRoulette = forwardRef<TileRouletteHandle, TileRouletteProps>(
         if (spinning || items.length === 0) return;
         const n = items.length;
         const start = Math.floor(Math.random() * n);
-        const targetIndex = Math.floor(Math.random() * n);
+        const eligible = excludeIds?.length
+          ? items.map((_, i) => i).filter((i) => !excludeIds.includes(items[i].id))
+          : [];
+        const pool = eligible.length > 0 ? eligible : items.map((_, i) => i);
+        const targetIndex = pool[Math.floor(Math.random() * pool.length)];
         const forward = ((targetIndex - start) % n + n) % n;
         const loops = Math.ceil((MIN_STEPS - forward) / n);
         const totalSteps = forward + Math.max(loops, 1) * n;
@@ -75,7 +80,7 @@ const TileRoulette = forwardRef<TileRouletteHandle, TileRouletteProps>(
             <motion.div
               key={item.id}
               className={`tile ${isActive ? 'tile--active' : ''} ${isWinner ? 'tile--winner' : ''} ${isDim ? 'tile--dim' : ''}`}
-              style={{ background: item.color }}
+              style={{ borderTopColor: item.color }}
               animate={isActive ? { scale: 1.08 } : { scale: 1 }}
               transition={{ duration: 0.15 }}
             >

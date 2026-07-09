@@ -4,8 +4,8 @@
   "description": "카테고리부터 세부 메뉴까지 룰렛으로 정하고, 서귀포 맛집을 바로 검색해보세요.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a1a2e",
-  "theme_color": "#1a1a2e",
+  "background_color": "#fbf1e4",
+  "theme_color": "#fbf1e4",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }

@@ -5,6 +5,7 @@ import type { MenuCategory, RouletteType } from '../data/menuData';
 import { pageTransition, pageVariants } from '../lib/motion';
 import { tintCycle } from '../lib/color';
 import { miniConfetti } from '../lib/confetti';
+import { getRecentMenuNames } from '../lib/localHistory';
 
 interface Props {
   type: RouletteType;
@@ -27,6 +28,11 @@ export default function MenuScreen({ type, category, onBack, onMenuChosen }: Pro
     }));
   }, [category]);
 
+  const excludeIds = useMemo(() => {
+    const recent = new Set(getRecentMenuNames(6));
+    return items.filter((item) => recent.has(item.label)).map((item) => item.id);
+  }, [items]);
+
   const handleSpin = () => {
     setLanded(null);
     tileRef.current?.spin();
@@ -40,7 +46,7 @@ export default function MenuScreen({ type, category, onBack, onMenuChosen }: Pro
 
   return (
     <motion.div
-      className="screen"
+      className="screen screen--with-bar"
       variants={pageVariants}
       initial="initial"
       animate="animate"
@@ -51,6 +57,7 @@ export default function MenuScreen({ type, category, onBack, onMenuChosen }: Pro
         ← {type.name} 카테고리 다시
       </button>
 
+      <span className="eyebrow">STEP 02 · 메뉴 선택</span>
       <h2 className="screen-title">
         {category.emoji} {category.name} 메뉴 룰렛
       </h2>
@@ -60,42 +67,45 @@ export default function MenuScreen({ type, category, onBack, onMenuChosen }: Pro
         ref={tileRef}
         items={items}
         disabled={spinning}
+        excludeIds={excludeIds}
         onSpinStart={() => setSpinning(true)}
         onSpinEnd={handleSpinEnd}
       />
 
-      <motion.button
-        type="button"
-        className="spin-btn"
-        onClick={handleSpin}
-        disabled={spinning}
-        whileTap={{ scale: 0.96 }}
-      >
-        {spinning ? '돌아가는 중...' : '메뉴 룰렛 돌리기 🎲'}
-      </motion.button>
-
-      <AnimatePresence>
-        {landed && !spinning && (
-          <motion.div
-            className="result-banner"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 24 }}
-          >
-            <p>
-              오늘의 메뉴: <b>{landed}</b>
-            </p>
-            <motion.button
-              type="button"
-              className="primary-btn"
-              whileTap={{ scale: 0.96 }}
-              onClick={() => onMenuChosen(landed)}
+      <div className="bottom-bar">
+        <AnimatePresence mode="wait">
+          {landed && !spinning ? (
+            <motion.div
+              key="landed"
+              className="landed-sheet"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 24 }}
             >
-              결과 확인하기 →
+              <span className="landed-info">
+                <span className="landed-label">오늘의 메뉴</span>
+                <span className="landed-value">{landed}</span>
+              </span>
+              <button type="button" className="cta-btn cta-btn--compact" onClick={() => onMenuChosen(landed)}>
+                결과 확인 →
+              </button>
+            </motion.div>
+          ) : (
+            <motion.button
+              key="spin"
+              type="button"
+              className="cta-btn"
+              onClick={handleSpin}
+              disabled={spinning}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {spinning ? '돌아가는 중...' : '메뉴 룰렛 돌리기 🎲'}
             </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 }

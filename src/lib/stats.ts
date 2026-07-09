@@ -50,3 +50,18 @@ export async function fetchRecentPicks(count = 8): Promise<PickRecord[]> {
     return [];
   }
 }
+
+export interface PickStat extends PickRecord {
+  count: number;
+}
+
+export async function fetchTopPicks(count = 20): Promise<PickStat[]> {
+  try {
+    const q = query(collection(db, 'pickStats'), orderBy('count', 'desc'), limit(count));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => d.data() as PickStat);
+  } catch (err) {
+    console.warn('[firestore] fetchTopPicks failed', err);
+    return [];
+  }
+}
