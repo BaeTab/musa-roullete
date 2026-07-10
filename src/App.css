@@ -755,6 +755,19 @@
   font-weight: 800;
 }
 
+.round-amount-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-faint);
+  padding: 0 2px;
+}
+
 .round-card-quick {
   display: flex;
   gap: 8px;

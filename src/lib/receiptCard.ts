@@ -2,8 +2,10 @@ import { formatWon } from './settlement';
 
 export interface ReceiptRound {
   label: string;
-  amount: number;
+  sharedAmount: number;
+  drinkAmount: number;
   participantCount: number;
+  drinkerCount: number;
 }
 
 export interface ReceiptPerson {
@@ -27,6 +29,7 @@ const TITLE_H = 46;
 const SUBTITLE_H = 30;
 const HEADER_GAP = 22;
 const ROUND_ROW_H = 50;
+const ROUND_SUBLINE_H = 24;
 const TOTAL_ROW_H = 84;
 const SECTION_GAP = 30;
 const LABEL_ROW_H = 34;
@@ -43,14 +46,19 @@ const LINE = '#e5e8eb';
 const ACCENT = '#ff6f0f';
 const ACCENT_SOFT = '#fff3e9';
 
+function roundRowHeight(round: ReceiptRound): number {
+  return round.drinkAmount > 0 ? ROUND_ROW_H + ROUND_SUBLINE_H : ROUND_ROW_H;
+}
+
 function computeHeight(payload: ReceiptPayload): number {
+  const roundsHeight = payload.rounds.reduce((sum, r) => sum + roundRowHeight(r), 0);
   return (
     PAD_TOP +
     TITLE_H +
     SUBTITLE_H +
     HEADER_GAP +
     16 +
-    payload.rounds.length * ROUND_ROW_H +
+    roundsHeight +
     16 +
     TOTAL_ROW_H +
     SECTION_GAP +
@@ -162,6 +170,7 @@ export async function generateReceiptCard(payload: ReceiptPayload): Promise<Blob
 
   payload.rounds.forEach((round) => {
     const rowY = y + ROUND_ROW_H / 2 + 7;
+    const roundTotal = round.sharedAmount + round.drinkAmount;
 
     ctx.textAlign = 'left';
     ctx.font = '700 20px Pretendard, sans-serif';
@@ -172,9 +181,17 @@ export async function generateReceiptCard(payload: ReceiptPayload): Promise<Blob
     ctx.textAlign = 'right';
     ctx.font = '700 20px Pretendard, sans-serif';
     ctx.fillStyle = SUB;
-    ctx.fillText(formatWon(round.amount), WIDTH - PAD_X, rowY);
+    ctx.fillText(formatWon(roundTotal), WIDTH - PAD_X, rowY);
 
-    y += ROUND_ROW_H;
+    if (round.drinkAmount > 0) {
+      const subY = rowY + ROUND_SUBLINE_H - 4;
+      ctx.textAlign = 'left';
+      ctx.font = '500 15px Pretendard, sans-serif';
+      ctx.fillStyle = FAINT;
+      ctx.fillText(`주류 ${formatWon(round.drinkAmount)} · 음주 ${round.drinkerCount}명`, PAD_X, subY);
+    }
+
+    y += roundRowHeight(round);
   });
 
   y += 16;

@@ -70,9 +70,9 @@ export default function SettlementScreen({ onBack }: Props) {
     setRounds((prev) => prev.map((r) => (r.id === id ? { ...r, label } : r)));
   };
 
-  const handleAmountChange = (id: string, raw: string) => {
+  const handleAmountChange = (id: string, field: 'sharedAmount' | 'drinkAmount', raw: string) => {
     const digits = raw.replace(/[^0-9]/g, '');
-    setRounds((prev) => prev.map((r) => (r.id === id ? { ...r, amount: digits ? Number(digits) : 0 } : r)));
+    setRounds((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: digits ? Number(digits) : 0 } : r)));
   };
 
   const setRoundParticipants = (id: string, ids: string[]) => {
@@ -107,8 +107,10 @@ export default function SettlementScreen({ onBack }: Props) {
         dateLabel,
         rounds: rounds.map((r) => ({
           label: r.label || '차수',
-          amount: r.amount,
+          sharedAmount: r.sharedAmount,
+          drinkAmount: r.drinkAmount,
           participantCount: r.participantIds.length,
+          drinkerCount: r.participantIds.filter((id) => participants.find((p) => p.id === id)?.drinker).length,
         })),
         people: totals.map((t) => ({
           name: t.participant.name || '이름없음',
@@ -138,7 +140,7 @@ export default function SettlementScreen({ onBack }: Props) {
 
       <div className="head">
         <h1 className="head-title">정산 계산기</h1>
-        <p className="head-sub">차수별로, 음주 여부별로 나눠서 계산해요</p>
+        <p className="head-sub">차수마다 공통 금액과 주류 금액을 따로 나눠서 계산해요</p>
       </div>
 
       <div className="settle-section">
@@ -186,8 +188,35 @@ export default function SettlementScreen({ onBack }: Props) {
             <div className="round-list">
               {rounds.map((round) => {
                 const includedCount = round.participantIds.length;
-                const perPerson =
-                  includedCount > 0 ? formatWon(Math.floor(round.amount / includedCount / 10) * 10) : null;
+                const drinkerCount = round.participantIds.filter(
+                  (id) => participants.find((p) => p.id === id)?.drinker,
+                ).length;
+                const drinkPoolCount = drinkerCount > 0 ? drinkerCount : includedCount;
+
+                const sharedPerPerson =
+                  includedCount > 0 && round.sharedAmount > 0
+                    ? formatWon(Math.floor(round.sharedAmount / includedCount / 10) * 10)
+                    : null;
+                const drinkPerPerson =
+                  drinkPoolCount > 0 && round.drinkAmount > 0
+                    ? formatWon(Math.floor(round.drinkAmount / drinkPoolCount / 10) * 10)
+                    : null;
+
+                const noteParts: string[] = [];
+                if (includedCount > 0) {
+                  noteParts.push(`${includedCount}명 참여`);
+                  if (sharedPerPerson) noteParts.push(`공통 1인당 ${sharedPerPerson}`);
+                  if (drinkPerPerson) {
+                    noteParts.push(
+                      drinkerCount > 0
+                        ? `주류는 음주자 ${drinkerCount}명이 ${drinkPerPerson}씩`
+                        : `음주자가 없어 주류도 전체가 ${drinkPerPerson}씩`,
+                    );
+                  }
+                } else {
+                  noteParts.push('참여자를 선택해주세요');
+                }
+
                 return (
                   <div className="round-card" key={round.id}>
                     <div className="round-card-head">
@@ -208,14 +237,29 @@ export default function SettlementScreen({ onBack }: Props) {
                       </button>
                     </div>
 
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      className="field-input field-input--amount"
-                      value={round.amount ? round.amount.toLocaleString('ko-KR') : ''}
-                      placeholder="금액을 입력하세요"
-                      onChange={(e) => handleAmountChange(round.id, e.target.value)}
-                    />
+                    <div className="round-amount-group">
+                      <span className="field-label">공통 금액 · 다같이 분담 (식사·안주 등)</span>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        className="field-input field-input--amount"
+                        value={round.sharedAmount ? round.sharedAmount.toLocaleString('ko-KR') : ''}
+                        placeholder="0"
+                        onChange={(e) => handleAmountChange(round.id, 'sharedAmount', e.target.value)}
+                      />
+                    </div>
+
+                    <div className="round-amount-group">
+                      <span className="field-label">주류 금액 · 음주자만 분담 (선택)</span>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        className="field-input field-input--amount"
+                        value={round.drinkAmount ? round.drinkAmount.toLocaleString('ko-KR') : ''}
+                        placeholder="0"
+                        onChange={(e) => handleAmountChange(round.id, 'drinkAmount', e.target.value)}
+                      />
+                    </div>
 
                     <div className="round-card-quick">
                       <button
@@ -223,19 +267,7 @@ export default function SettlementScreen({ onBack }: Props) {
                         className="text-chip"
                         onClick={() => setRoundParticipants(round.id, participants.map((p) => p.id))}
                       >
-                        전체
-                      </button>
-                      <button
-                        type="button"
-                        className="text-chip"
-                        onClick={() =>
-                          setRoundParticipants(
-                            round.id,
-                            participants.filter((p) => p.drinker).map((p) => p.id),
-                          )
-                        }
-                      >
-                        음주자만
+                        전체 참여
                       </button>
                     </div>
 
@@ -252,11 +284,7 @@ export default function SettlementScreen({ onBack }: Props) {
                       ))}
                     </div>
 
-                    <p className="round-card-note">
-                      {includedCount > 0
-                        ? `${includedCount}명이 나눠 낼게요 · 1인당 약 ${perPerson}`
-                        : '참여자를 선택해주세요'}
-                    </p>
+                    <p className="round-card-note">{noteParts.join(' · ')}</p>
                   </div>
                 );
               })}

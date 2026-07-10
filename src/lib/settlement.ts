@@ -7,7 +7,10 @@ export interface Participant {
 export interface Round {
   id: string;
   label: string;
-  amount: number;
+  /** 식사·안주 등 참여자 전원이 나누는 금액 */
+  sharedAmount: number;
+  /** 술값 등 음주자만 나누는 금액 */
+  drinkAmount: number;
   participantIds: string[];
 }
 
@@ -29,7 +32,7 @@ export function makeParticipant(name: string): Participant {
 }
 
 export function makeRound(label: string, participantIds: string[]): Round {
-  return { id: makeId('r'), label, amount: 0, participantIds };
+  return { id: makeId('r'), label, sharedAmount: 0, drinkAmount: 0, participantIds };
 }
 
 export function formatWon(amount: number): string {
@@ -61,19 +64,35 @@ export function computeTotals(participants: Participant[], rounds: Round[]): Per
 
   rounds.forEach((round) => {
     const included = round.participantIds.filter((id) => totals.has(id));
-    if (included.length === 0 || round.amount <= 0) return;
-    const shares = splitEvenly(round.amount, included.length);
-    included.forEach((id, i) => {
-      const entry = totals.get(id);
-      if (!entry) return;
-      entry.total += shares[i];
-      entry.breakdown.push({ roundId: round.id, roundLabel: round.label, amount: shares[i] });
-    });
+    if (included.length === 0) return;
+
+    if (round.sharedAmount > 0) {
+      const shares = splitEvenly(round.sharedAmount, included.length);
+      included.forEach((id, i) => {
+        const entry = totals.get(id);
+        if (!entry) return;
+        entry.total += shares[i];
+        entry.breakdown.push({ roundId: round.id, roundLabel: `${round.label} · 공통`, amount: shares[i] });
+      });
+    }
+
+    if (round.drinkAmount > 0) {
+      // 이 차수의 참여자 중 음주자만 나누되, 음주자로 표시된 사람이 없으면 참여자 전원이 나눕니다.
+      const drinkers = included.filter((id) => totals.get(id)?.participant.drinker);
+      const drinkPool = drinkers.length > 0 ? drinkers : included;
+      const shares = splitEvenly(round.drinkAmount, drinkPool.length);
+      drinkPool.forEach((id, i) => {
+        const entry = totals.get(id);
+        if (!entry) return;
+        entry.total += shares[i];
+        entry.breakdown.push({ roundId: round.id, roundLabel: `${round.label} · 주류`, amount: shares[i] });
+      });
+    }
   });
 
   return participants.map((p) => totals.get(p.id)).filter((t): t is PersonTotal => !!t);
 }
 
 export function totalAmount(rounds: Round[]): number {
-  return rounds.reduce((sum, r) => sum + r.amount, 0);
+  return rounds.reduce((sum, r) => sum + r.sharedAmount + r.drinkAmount, 0);
 }
