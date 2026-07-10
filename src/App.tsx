@@ -8,6 +8,7 @@ import HistoryScreen from './screens/HistoryScreen';
 import RankingScreen from './screens/RankingScreen';
 import PartyStartScreen from './screens/PartyStartScreen';
 import PartyRoomScreen from './screens/PartyRoomScreen';
+import SettlementScreen from './screens/SettlementScreen';
 import type { MenuCategory, RouletteType } from './data/menuData';
 import './App.css';
 
@@ -19,7 +20,8 @@ type View =
   | { screen: 'history' }
   | { screen: 'ranking' }
   | { screen: 'party-start' }
-  | { screen: 'party-room'; sessionId: string };
+  | { screen: 'party-room'; sessionId: string }
+  | { screen: 'settlement' };
 
 function getInitialView(): View {
   const sessionId = new URLSearchParams(window.location.search).get('party');
@@ -46,7 +48,12 @@ export default function App() {
             onOpenHistory={() => setView({ screen: 'history' })}
             onOpenRanking={() => setView({ screen: 'ranking' })}
             onOpenParty={() => setView({ screen: 'party-start' })}
+            onOpenSettlement={() => setView({ screen: 'settlement' })}
           />
+        )}
+
+        {view.screen === 'settlement' && (
+          <SettlementScreen key="settlement" onBack={() => setView({ screen: 'home' })} />
         )}
 
         {view.screen === 'history' && <HistoryScreen key="history" onBack={() => setView({ screen: 'home' })} />}

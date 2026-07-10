@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ROULETTE_TYPES, type RouletteType } from '../data/menuData';
 import RecentPicksTicker from '../components/RecentPicksTicker';
-import { ChevronRight, Users, Trophy, Clock } from '../components/icons';
+import { ChevronRight, Users, Trophy, Clock, Receipt } from '../components/icons';
 import { pageTransition, pageVariants } from '../lib/motion';
 
 interface Props {
@@ -9,9 +9,16 @@ interface Props {
   onOpenHistory: () => void;
   onOpenRanking: () => void;
   onOpenParty: () => void;
+  onOpenSettlement: () => void;
 }
 
-export default function HomeScreen({ onSelectType, onOpenHistory, onOpenRanking, onOpenParty }: Props) {
+export default function HomeScreen({
+  onSelectType,
+  onOpenHistory,
+  onOpenRanking,
+  onOpenParty,
+  onOpenSettlement,
+}: Props) {
   return (
     <motion.div
       className="screen"
@@ -53,6 +60,10 @@ export default function HomeScreen({ onSelectType, onOpenHistory, onOpenRanking,
         <button type="button" className="quick-btn" onClick={onOpenHistory}>
           <Clock size={22} />
           <span className="quick-btn-label">기록</span>
+        </button>
+        <button type="button" className="quick-btn" onClick={onOpenSettlement}>
+          <Receipt size={22} />
+          <span className="quick-btn-label">정산</span>
         </button>
       </div>
 
