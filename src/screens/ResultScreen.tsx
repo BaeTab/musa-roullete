@@ -8,6 +8,7 @@ import { recordPick } from '../lib/stats';
 import { shareResult } from '../lib/share';
 import { addHistory, isFavorite, toggleFavorite } from '../lib/localHistory';
 import { shareOrDownloadCard } from '../lib/shareCard';
+import { Star, StarFilled, Share, Download, Refresh, Home } from '../components/icons';
 
 interface Props {
   type: RouletteType;
@@ -18,14 +19,14 @@ interface Props {
 }
 
 const SHARE_FEEDBACK: Record<string, string> = {
-  shared: '공유했어요! 🎉',
-  copied: '클립보드에 복사했어요 📋',
+  shared: '공유했어요!',
+  copied: '클립보드에 복사했어요',
   failed: '공유에 실패했어요',
 };
 
 const CARD_FEEDBACK: Record<string, string> = {
-  shared: '카드를 공유했어요! 🎉',
-  downloaded: '카드 이미지를 저장했어요 🖼️',
+  shared: '카드를 공유했어요!',
+  downloaded: '카드 이미지를 저장했어요',
   failed: '이미지 생성에 실패했어요',
 };
 
@@ -61,8 +62,7 @@ export default function ResultScreen({ type, category, menu, onRespin, onRestart
   }, [type, category, menu]);
 
   const handleToggleFavorite = () => {
-    const nowFavorited = toggleFavorite(localPickPayload);
-    setFavorited(nowFavorited);
+    setFavorited(toggleFavorite(localPickPayload));
   };
 
   useEffect(() => {
@@ -83,7 +83,7 @@ export default function ResultScreen({ type, category, menu, onRespin, onRestart
       categoryName: category.name,
       categoryEmoji: category.emoji,
       menu,
-      gradient: type.gradient,
+      gradient: [type.accent, type.accent],
     });
     setShareMessage(CARD_FEEDBACK[result]);
   };
@@ -99,28 +99,27 @@ export default function ResultScreen({ type, category, menu, onRespin, onRestart
     >
       <motion.div
         className="result-card"
-        initial={{ scale: 0.7, opacity: 0, rotate: -6 }}
-        animate={{ scale: 1, opacity: 1, rotate: 0 }}
-        transition={{ type: 'spring', stiffness: 220, damping: 16, delay: 0.1 }}
+        initial={{ scale: 0.92, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.05 }}
       >
-        <div
-          className="result-card-bar"
-          style={{ background: `linear-gradient(90deg, ${type.gradient[0]}, ${type.gradient[1]})` }}
-        />
         <button
           type="button"
           className={`favorite-toggle ${favorited ? 'favorite-toggle--on' : ''}`}
           onClick={handleToggleFavorite}
           aria-label={favorited ? '즐겨찾기 해제' : '즐겨찾기 추가'}
         >
-          {favorited ? '★' : '☆'}
+          {favorited ? <StarFilled /> : <Star />}
         </button>
-        <span className="result-eyebrow" style={{ background: type.gradient[0] }}>
-          {type.emoji} {type.name} · {category.emoji} {category.name}
+        <span className="result-chip" style={{ background: type.soft, color: type.accent }}>
+          {type.name} · {category.name}
         </span>
-        <span className="result-menu">{menu}</span>
+        <span className="result-menu">
+          {menu}
+          <span className="result-menu-emoji">{category.emoji}</span>
+        </span>
         <div className="result-divider" />
-        <span className="result-caption">오늘의 선택은 바로 이거예요!</span>
+        <span className="result-caption">오늘은 이거 어때요?</span>
       </motion.div>
 
       <motion.a
@@ -132,37 +131,29 @@ export default function ResultScreen({ type, category, menu, onRespin, onRestart
           e.preventDefault();
           openNaverSearch(menu);
         }}
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
-        whileTap={{ scale: 0.96 }}
+        transition={{ delay: 0.3 }}
+        whileTap={{ scale: 0.98 }}
       >
         네이버에서 서귀포 {menu} 맛집 찾기
       </motion.a>
 
-      <motion.button
-        type="button"
-        className="share-btn"
-        onClick={handleShare}
-        initial={{ opacity: 0, y: 20 }}
+      <motion.div
+        className="result-secondary"
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        whileTap={{ scale: 0.96 }}
+        transition={{ delay: 0.36 }}
       >
-        📤 결과 공유하기
-      </motion.button>
-
-      <motion.button
-        type="button"
-        className="share-btn"
-        onClick={handleSaveCard}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.42 }}
-        whileTap={{ scale: 0.96 }}
-      >
-        🖼️ 카드 이미지 저장
-      </motion.button>
+        <button type="button" className="pill-btn" onClick={handleShare} aria-label="공유하기">
+          <Share size={18} />
+          공유하기
+        </button>
+        <button type="button" className="pill-btn" onClick={handleSaveCard} aria-label="카드 저장">
+          <Download size={18} />
+          카드 저장
+        </button>
+      </motion.div>
 
       <AnimatePresence>
         {shareMessage && (
@@ -178,16 +169,18 @@ export default function ResultScreen({ type, category, menu, onRespin, onRestart
       </AnimatePresence>
 
       <motion.div
-        className="result-actions"
-        initial={{ opacity: 0, y: 20 }}
+        className="result-text-row"
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.45 }}
+        transition={{ delay: 0.42 }}
       >
-        <button type="button" className="ghost-btn" onClick={onRespin}>
-          🔁 메뉴 다시 뽑기
+        <button type="button" className="text-btn" onClick={onRespin}>
+          <Refresh size={18} />
+          다시 뽑기
         </button>
-        <button type="button" className="ghost-btn" onClick={onRestart}>
-          🏠 처음으로
+        <button type="button" className="text-btn" onClick={onRestart}>
+          <Home size={18} />
+          처음으로
         </button>
       </motion.div>
     </motion.div>

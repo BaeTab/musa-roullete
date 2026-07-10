@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import Wheel, { type WheelHandle, type WheelSegment } from '../components/Wheel';
+import SlotReel, { type SlotReelHandle, type SlotSegment } from '../components/SlotReel';
+import { ChevronLeft } from '../components/icons';
 import type { MenuCategory, RouletteType } from '../data/menuData';
 import { pageTransition, pageVariants } from '../lib/motion';
 import { miniConfetti } from '../lib/confetti';
@@ -12,23 +13,22 @@ interface Props {
 }
 
 export default function CategoryScreen({ type, onBack, onCategoryChosen }: Props) {
-  const wheelRef = useRef<WheelHandle>(null);
+  const reelRef = useRef<SlotReelHandle>(null);
   const [spinning, setSpinning] = useState(false);
   const [landed, setLanded] = useState<MenuCategory | null>(null);
 
-  const segments: WheelSegment[] = type.categories.map((c) => ({
+  const segments: SlotSegment[] = type.categories.map((c) => ({
     id: c.id,
     label: c.name,
     emoji: c.emoji,
-    color: c.color,
   }));
 
   const handleSpin = () => {
     setLanded(null);
-    wheelRef.current?.spin();
+    reelRef.current?.spin();
   };
 
-  const handleSpinEnd = (seg: WheelSegment) => {
+  const handleSpinEnd = (seg: SlotSegment) => {
     setSpinning(false);
     const category = type.categories.find((c) => c.id === seg.id);
     if (category) {
@@ -46,21 +46,21 @@ export default function CategoryScreen({ type, onBack, onCategoryChosen }: Props
       exit="exit"
       transition={pageTransition}
     >
-      <button type="button" className="back-btn" onClick={onBack}>
-        ← 처음으로
+      <button type="button" className="top-back" onClick={onBack} aria-label="뒤로">
+        <ChevronLeft />
       </button>
 
-      <span className="eyebrow">STEP 01 · 카테고리 선택</span>
-      <h2 className="screen-title">
-        {type.emoji} {type.name} 카테고리 룰렛
-      </h2>
-      <p className="screen-desc">룰렛을 돌려서 오늘의 카테고리를 정해보세요</p>
+      <div className="head">
+        <h1 className="head-title">{type.name} 카테고리</h1>
+        <p className="head-sub">룰렛을 돌려 카테고리를 정해보세요</p>
+      </div>
 
-      <Wheel
-        ref={wheelRef}
+      <SlotReel
+        ref={reelRef}
         segments={segments}
+        accent={type.accent}
+        soft={type.soft}
         disabled={spinning}
-        centerEmoji={type.emoji}
         onSpinStart={() => setSpinning(true)}
         onSpinEnd={handleSpinEnd}
       />
@@ -77,10 +77,12 @@ export default function CategoryScreen({ type, onBack, onCategoryChosen }: Props
             >
               <span className="landed-info">
                 <span className="landed-label">선택된 카테고리</span>
-                <span className="landed-value">{landed.emoji} {landed.name}</span>
+                <span className="landed-value">
+                  {landed.emoji} {landed.name}
+                </span>
               </span>
               <button type="button" className="cta-btn cta-btn--compact" onClick={() => onCategoryChosen(landed)}>
-                다음 →
+                다음
               </button>
             </motion.div>
           ) : (
@@ -94,7 +96,14 @@ export default function CategoryScreen({ type, onBack, onCategoryChosen }: Props
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              {spinning ? '돌아가는 중...' : '카테고리 룰렛 돌리기 🎲'}
+              {spinning ? (
+                <>
+                  <span className="cta-spinner" />
+                  돌리는 중...
+                </>
+              ) : (
+                '룰렛 돌리기'
+              )}
             </motion.button>
           )}
         </AnimatePresence>

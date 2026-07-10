@@ -1,9 +1,9 @@
 import { useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import TileRoulette, { type TileRouletteHandle, type TileItem } from '../components/TileRoulette';
+import { ChevronLeft } from '../components/icons';
 import type { MenuCategory, RouletteType } from '../data/menuData';
 import { pageTransition, pageVariants } from '../lib/motion';
-import { tintCycle } from '../lib/color';
 import { miniConfetti } from '../lib/confetti';
 import { getRecentMenuNames } from '../lib/localHistory';
 
@@ -19,14 +19,10 @@ export default function MenuScreen({ type, category, onBack, onMenuChosen }: Pro
   const [spinning, setSpinning] = useState(false);
   const [landed, setLanded] = useState<string | null>(null);
 
-  const items: TileItem[] = useMemo(() => {
-    const colors = tintCycle(category.color, category.items.length);
-    return category.items.map((item, i) => ({
-      id: `${i}`,
-      label: item,
-      color: colors[i],
-    }));
-  }, [category]);
+  const items: TileItem[] = useMemo(
+    () => category.items.map((item, i) => ({ id: `${i}`, label: item })),
+    [category],
+  );
 
   const excludeIds = useMemo(() => {
     const recent = new Set(getRecentMenuNames(6));
@@ -53,19 +49,20 @@ export default function MenuScreen({ type, category, onBack, onMenuChosen }: Pro
       exit="exit"
       transition={pageTransition}
     >
-      <button type="button" className="back-btn" onClick={onBack}>
-        ← {type.name} 카테고리 다시
+      <button type="button" className="top-back" onClick={onBack} aria-label="뒤로">
+        <ChevronLeft />
       </button>
 
-      <span className="eyebrow">STEP 02 · 메뉴 선택</span>
-      <h2 className="screen-title">
-        {category.emoji} {category.name} 메뉴 룰렛
-      </h2>
-      <p className="screen-desc">이제 세부 메뉴를 뽑아볼까요?</p>
+      <div className="head">
+        <h1 className="head-title">{category.name} 메뉴</h1>
+        <p className="head-sub">세부 메뉴를 뽑아볼까요?</p>
+      </div>
 
       <TileRoulette
         ref={tileRef}
         items={items}
+        accent={type.accent}
+        soft={type.soft}
         disabled={spinning}
         excludeIds={excludeIds}
         onSpinStart={() => setSpinning(true)}
@@ -87,7 +84,7 @@ export default function MenuScreen({ type, category, onBack, onMenuChosen }: Pro
                 <span className="landed-value">{landed}</span>
               </span>
               <button type="button" className="cta-btn cta-btn--compact" onClick={() => onMenuChosen(landed)}>
-                결과 확인 →
+                결과 확인
               </button>
             </motion.div>
           ) : (
@@ -101,7 +98,14 @@ export default function MenuScreen({ type, category, onBack, onMenuChosen }: Pro
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              {spinning ? '돌아가는 중...' : '메뉴 룰렛 돌리기 🎲'}
+              {spinning ? (
+                <>
+                  <span className="cta-spinner" />
+                  돌리는 중...
+                </>
+              ) : (
+                '룰렛 돌리기'
+              )}
             </motion.button>
           )}
         </AnimatePresence>

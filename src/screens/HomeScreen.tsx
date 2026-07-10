@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ROULETTE_TYPES, type RouletteType } from '../data/menuData';
 import RecentPicksTicker from '../components/RecentPicksTicker';
+import { ChevronRight, Users, Trophy, Clock } from '../components/icons';
 import { pageTransition, pageVariants } from '../lib/motion';
 
 interface Props {
@@ -13,62 +14,47 @@ interface Props {
 export default function HomeScreen({ onSelectType, onOpenHistory, onOpenRanking, onOpenParty }: Props) {
   return (
     <motion.div
-      className="screen home-screen"
+      className="screen"
       variants={pageVariants}
       initial="initial"
       animate="animate"
       exit="exit"
       transition={pageTransition}
     >
-      <div className="home-toolbar">
-        <button type="button" className="icon-btn" onClick={onOpenParty} aria-label="함께 정하기">
-          👥 함께
-        </button>
-        <button type="button" className="icon-btn" onClick={onOpenRanking} aria-label="인기 메뉴 랭킹">
-          🏆 랭킹
-        </button>
-        <button type="button" className="icon-btn" onClick={onOpenHistory} aria-label="히스토리 및 즐겨찾기">
-          📜 히스토리
-        </button>
+      <div className="head head--home">
+        <h1 className="head-title">오늘 뭐 먹지?</h1>
+        <p className="head-sub">룰렛이 대신 골라드릴게요</p>
       </div>
 
-      <div className="home-header">
-        <span className="eyebrow">TODAY&apos;S ROULETTE · 서귀포</span>
-        <motion.h1
-          className="app-title"
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          오늘 뭐 먹지? <span className="app-title-wheel">🎡</span>
-        </motion.h1>
-        <p className="app-subtitle">선택은 룰렛에게, 맛집은 서귀포에서</p>
-      </div>
-
-      <motion.div
-        className="menu-list"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1, duration: 0.35 }}
-      >
+      <div className="list-card">
         {ROULETTE_TYPES.map((type) => (
-          <button
-            key={type.id}
-            type="button"
-            className="menu-row"
-            onClick={() => onSelectType(type)}
-          >
-            <span className="menu-row-icon" style={{ background: type.gradient[0] }}>
+          <button key={type.id} type="button" className="list-row" onClick={() => onSelectType(type)}>
+            <span className="list-row-icon" style={{ background: type.soft }}>
               {type.emoji}
             </span>
-            <span className="menu-row-body">
-              <span className="menu-row-title">{type.name}</span>
-              <span className="menu-row-sub">{type.tagline}</span>
+            <span className="list-row-main">
+              <span className="list-row-title">{type.name}</span>
+              <span className="list-row-sub">{type.tagline}</span>
             </span>
-            <span className="menu-row-chevron">›</span>
+            <ChevronRight size={20} className="list-row-chevron" />
           </button>
         ))}
-      </motion.div>
+      </div>
+
+      <div className="quick-row">
+        <button type="button" className="quick-btn" onClick={onOpenParty}>
+          <Users size={22} />
+          <span className="quick-btn-label">함께 정하기</span>
+        </button>
+        <button type="button" className="quick-btn" onClick={onOpenRanking}>
+          <Trophy size={22} />
+          <span className="quick-btn-label">랭킹</span>
+        </button>
+        <button type="button" className="quick-btn" onClick={onOpenHistory}>
+          <Clock size={22} />
+          <span className="quick-btn-label">기록</span>
+        </button>
+      </div>
 
       <RecentPicksTicker />
     </motion.div>

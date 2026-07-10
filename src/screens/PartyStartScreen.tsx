@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ROULETTE_TYPES, type RouletteType } from '../data/menuData';
 import { pageTransition, pageVariants } from '../lib/motion';
+import { ChevronLeft, ChevronRight } from '../components/icons';
 import { createPartySession } from '../lib/party';
 
 interface Props {
@@ -35,36 +36,39 @@ export default function PartyStartScreen({ onBack, onSessionCreated }: Props) {
       exit="exit"
       transition={pageTransition}
     >
-      <button type="button" className="back-btn" onClick={onBack}>
-        ← 처음으로
+      <button type="button" className="top-back" onClick={onBack} aria-label="뒤로">
+        <ChevronLeft />
       </button>
 
-      <span className="eyebrow">TOGETHER</span>
-      <h2 className="screen-title">👥 함께 정하기</h2>
-      <p className="screen-desc">타입을 고르면 투표방이 만들어져요. 링크를 공유해서 같이 골라보세요!</p>
+      <div className="head">
+        <h1 className="head-title">함께 정하기</h1>
+        <p className="head-sub">타입을 고르면 투표방이 만들어져요. 링크를 공유해 같이 골라보세요</p>
+      </div>
 
-      <div className="menu-list">
+      <div className="list-card">
         {ROULETTE_TYPES.map((type) => (
           <button
             key={type.id}
             type="button"
-            className="menu-row"
+            className="list-row"
             onClick={() => handlePick(type)}
             disabled={!!creating}
           >
-            <span className="menu-row-icon" style={{ background: type.gradient[0] }}>
+            <span className="list-row-icon" style={{ background: type.soft }}>
               {type.emoji}
             </span>
-            <span className="menu-row-body">
-              <span className="menu-row-title">{type.name}</span>
-              <span className="menu-row-sub">{creating === type.id ? '투표방 만드는 중...' : type.tagline}</span>
+            <span className="list-row-main">
+              <span className="list-row-title">{type.name}</span>
+              <span className="list-row-sub">
+                {creating === type.id ? '투표방 만드는 중...' : type.tagline}
+              </span>
             </span>
-            <span className="menu-row-chevron">›</span>
+            <ChevronRight size={20} className="list-row-chevron" />
           </button>
         ))}
       </div>
 
-      {error && <p className="empty-state">{error}</p>}
+      {error && <p className="error-text">{error}</p>}
     </motion.div>
   );
 }

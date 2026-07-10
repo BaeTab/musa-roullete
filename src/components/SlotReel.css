@@ -1,0 +1,82 @@
+.slot-reel {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  overflow: hidden;
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  touch-action: manipulation;
+}
+
+.slot-reel--disabled {
+  pointer-events: none;
+}
+
+.slot-reel::before,
+.slot-reel::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 32%;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.slot-reel::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--surface), rgba(255, 255, 255, 0));
+}
+
+.slot-reel::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--surface), rgba(255, 255, 255, 0));
+}
+
+.slot-indicator {
+  position: absolute;
+  top: 128px;
+  left: 12px;
+  right: 12px;
+  height: 64px;
+  border-radius: 12px;
+  z-index: 1;
+}
+
+.slot-indicator-bar {
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 0;
+  width: 3px;
+  border-radius: 3px;
+}
+
+.slot-strip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  will-change: transform;
+}
+
+.slot-row {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.slot-row-emoji {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.slot-row-label {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-strong);
+}

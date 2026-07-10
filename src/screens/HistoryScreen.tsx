@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { pageTransition, pageVariants } from '../lib/motion';
+import { ChevronLeft } from '../components/icons';
 import { getFavorites, getHistory, removeFavorite, type LocalPick } from '../lib/localHistory';
 
 interface Props {
@@ -22,7 +23,7 @@ function formatTime(ts: number): string {
 function PickRow({ pick, trailing }: { pick: LocalPick; trailing?: ReactNode }) {
   return (
     <div className="pick-row">
-      <div className="pick-row-info">
+      <div className="pick-row-main">
         <span className="pick-row-menu">{pick.menu}</span>
         <span className="pick-row-meta">
           {pick.typeEmoji} {pick.typeName} · {pick.categoryEmoji} {pick.categoryName}
@@ -56,13 +57,14 @@ export default function HistoryScreen({ onBack }: Props) {
       exit="exit"
       transition={pageTransition}
     >
-      <button type="button" className="back-btn" onClick={onBack}>
-        ← 처음으로
+      <button type="button" className="top-back" onClick={onBack} aria-label="뒤로">
+        <ChevronLeft />
       </button>
 
-      <span className="eyebrow">MY PICKS</span>
-      <h2 className="screen-title">📜 히스토리 & 즐겨찾기</h2>
-      <p className="screen-desc">지금까지 룰렛이 골라준 메뉴들이에요</p>
+      <div className="head">
+        <h1 className="head-title">기록</h1>
+        <p className="head-sub">지금까지 룰렛이 골라준 메뉴예요</p>
+      </div>
 
       <div className="tab-switch">
         <button
@@ -83,7 +85,9 @@ export default function HistoryScreen({ onBack }: Props) {
 
       {list.length === 0 ? (
         <p className="empty-state">
-          {tab === 'history' ? '아직 뽑은 메뉴가 없어요. 룰렛을 돌려보세요!' : '즐겨찾기한 메뉴가 없어요. 결과 화면에서 ☆를 눌러보세요.'}
+          {tab === 'history'
+            ? '아직 뽑은 메뉴가 없어요. 룰렛을 돌려보세요!'
+            : '즐겨찾기한 메뉴가 없어요. 결과 화면에서 별을 눌러보세요.'}
         </p>
       ) : (
         <div className="pick-list">
@@ -93,8 +97,13 @@ export default function HistoryScreen({ onBack }: Props) {
               pick={pick}
               trailing={
                 tab === 'favorites' ? (
-                  <button type="button" className="pick-row-remove" onClick={() => handleRemoveFavorite(pick.menu)} aria-label="즐겨찾기 삭제">
-                    ✕
+                  <button
+                    type="button"
+                    className="pick-row-remove"
+                    onClick={() => handleRemoveFavorite(pick.menu)}
+                    aria-label="즐겨찾기 삭제"
+                  >
+                    삭제
                   </button>
                 ) : undefined
               }

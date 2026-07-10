@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { pageTransition, pageVariants } from '../lib/motion';
 import { burstConfetti } from '../lib/confetti';
 import { buildNaverSearchUrl, openNaverSearch } from '../lib/naver';
+import { ChevronLeft, Check, LinkIcon, Home } from '../components/icons';
 import {
   buildPartyShareUrl,
   castVote,
@@ -63,7 +64,7 @@ export default function PartyRoomScreen({ sessionId, onExit }: Props) {
         transition={pageTransition}
       >
         <p className="empty-state">투표방을 찾을 수 없어요. 링크가 만료되었을 수 있어요.</p>
-        <button type="button" className="cta-btn" style={{ maxWidth: 320 }} onClick={onExit}>
+        <button type="button" className="cta-btn" onClick={onExit}>
           처음으로
         </button>
       </motion.div>
@@ -86,7 +87,7 @@ export default function PartyRoomScreen({ sessionId, onExit }: Props) {
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(buildPartyShareUrl(sessionId));
-      setToast('링크를 복사했어요 📋');
+      setToast('링크를 복사했어요');
     } catch {
       setToast('복사에 실패했어요');
     }
@@ -108,17 +109,18 @@ export default function PartyRoomScreen({ sessionId, onExit }: Props) {
       exit="exit"
       transition={pageTransition}
     >
-      <button type="button" className="back-btn" onClick={onExit}>
-        ← 처음으로
+      <button type="button" className="top-back" onClick={onExit} aria-label="뒤로">
+        <ChevronLeft />
       </button>
 
-      <span className="eyebrow">
-        TOGETHER · {session.typeEmoji} {session.typeName}
-      </span>
-      <h2 className="screen-title">👥 함께 정하기</h2>
-      <p className="screen-desc">
-        {session.status === 'voting' ? `${totalVotes}명이 투표했어요` : '투표가 마감됐어요!'}
-      </p>
+      <div className="head">
+        <h1 className="head-title">함께 정하기</h1>
+        <p className="head-sub">
+          {session.status === 'voting'
+            ? `${session.typeName} · ${totalVotes}명이 투표했어요`
+            : `${session.typeName} · 투표가 마감됐어요`}
+        </p>
+      </div>
 
       {session.status === 'voting' ? (
         <>
@@ -134,8 +136,10 @@ export default function PartyRoomScreen({ sessionId, onExit }: Props) {
                   className={`vote-row ${mine ? 'vote-row--mine' : ''}`}
                   onClick={() => handleCastVote(c.id)}
                 >
-                  <span className="vote-row-bar" style={{ width: `${pct}%` }} />
+                  <span className="vote-row-bar" style={{ width: `${pct}%`, background: session.typeSoft }} />
+                  {mine && <span className="vote-row-mark" />}
                   <span className="vote-row-label">
+                    {mine && <Check size={16} className="vote-row-check" />}
                     {c.categoryEmoji} {c.menu}
                   </span>
                   <span className="vote-row-count">{count}표</span>
@@ -144,9 +148,12 @@ export default function PartyRoomScreen({ sessionId, onExit }: Props) {
             })}
           </div>
 
-          <button type="button" className="share-btn" onClick={handleCopyLink}>
-            🔗 초대 링크 복사
-          </button>
+          <div className="result-secondary">
+            <button type="button" className="pill-btn" onClick={handleCopyLink}>
+              <LinkIcon size={18} />
+              초대 링크 복사
+            </button>
+          </div>
 
           <div className="bottom-bar">
             {isHost ? (
@@ -154,23 +161,22 @@ export default function PartyRoomScreen({ sessionId, onExit }: Props) {
                 투표 마감하고 결과 보기
               </button>
             ) : (
-              <p className="screen-desc">방장이 투표를 마감하면 결과가 나와요</p>
+              <p className="bottom-note">방장이 투표를 마감하면 결과가 나와요</p>
             )}
           </div>
         </>
       ) : winner ? (
         <>
           <div className="result-card">
-            <div
-              className="result-card-bar"
-              style={{ background: `linear-gradient(90deg, ${session.typeGradient[0]}, ${session.typeGradient[1]})` }}
-            />
-            <span className="result-eyebrow" style={{ background: session.typeGradient[0] }}>
-              {session.typeEmoji} {session.typeName} · {winner.categoryEmoji} {winner.categoryName}
+            <span className="result-chip" style={{ background: session.typeSoft, color: session.typeAccent }}>
+              {session.typeName} · {winner.categoryName}
             </span>
-            <span className="result-menu">{winner.menu}</span>
+            <span className="result-menu">
+              {winner.menu}
+              <span className="result-menu-emoji">{winner.categoryEmoji}</span>
+            </span>
             <div className="result-divider" />
-            <span className="result-caption">투표로 결정된 오늘의 메뉴예요!</span>
+            <span className="result-caption">투표로 정해진 오늘의 메뉴예요</span>
           </div>
           <a
             className="naver-btn"
@@ -184,9 +190,12 @@ export default function PartyRoomScreen({ sessionId, onExit }: Props) {
           >
             네이버에서 서귀포 {winner.menu} 맛집 찾기
           </a>
-          <button type="button" className="ghost-btn" style={{ width: '100%' }} onClick={onExit}>
-            🏠 처음으로
-          </button>
+          <div className="result-text-row">
+            <button type="button" className="text-btn" onClick={onExit}>
+              <Home size={18} />
+              처음으로
+            </button>
+          </div>
         </>
       ) : null}
 

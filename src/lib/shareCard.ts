@@ -12,17 +12,17 @@ const HEIGHT = 1350;
 
 function fitFontSize(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, startSize: number, minSize: number): number {
   let size = startSize;
-  ctx.font = `400 ${size}px "Bagel Fat One", Pretendard, sans-serif`;
+  ctx.font = `800 ${size}px Pretendard, sans-serif`;
   while (ctx.measureText(text).width > maxWidth && size > minSize) {
     size -= 6;
-    ctx.font = `400 ${size}px "Bagel Fat One", Pretendard, sans-serif`;
+    ctx.font = `800 ${size}px Pretendard, sans-serif`;
   }
   return size;
 }
 
 async function ensureFontsReady(): Promise<void> {
   try {
-    await document.fonts.load('400 120px "Bagel Fat One"');
+    await document.fonts.load('800 120px Pretendard');
     await document.fonts.load('400 32px Pretendard');
     await document.fonts.ready;
   } catch {
@@ -39,17 +39,12 @@ export async function generateShareCard(payload: ShareCardPayload): Promise<Blob
 
   await ensureFontsReady();
 
-  const bgGrad = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
-  bgGrad.addColorStop(0, payload.gradient[0]);
-  bgGrad.addColorStop(1, payload.gradient[1]);
-  ctx.fillStyle = bgGrad;
+  ctx.fillStyle = payload.gradient[0];
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-  const radial = ctx.createRadialGradient(WIDTH * 0.24, HEIGHT * 0.16, 0, WIDTH * 0.24, HEIGHT * 0.16, WIDTH * 0.75);
-  radial.addColorStop(0, 'rgba(255,255,255,0.3)');
-  radial.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = radial;
-  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  const overlayHeight = HEIGHT * 0.2;
+  ctx.fillStyle = 'rgba(0,0,0,0.08)';
+  ctx.fillRect(0, HEIGHT - overlayHeight, WIDTH, overlayHeight);
 
   ctx.textAlign = 'center';
   ctx.fillStyle = '#ffffff';
@@ -60,7 +55,7 @@ export async function generateShareCard(payload: ShareCardPayload): Promise<Blob
   ctx.globalAlpha = 1;
 
   const menuFontSize = fitFontSize(ctx, payload.menu, WIDTH * 0.82, 128, 56);
-  ctx.font = `400 ${menuFontSize}px "Bagel Fat One", Pretendard, sans-serif`;
+  ctx.font = `800 ${menuFontSize}px Pretendard, sans-serif`;
   ctx.fillText(payload.menu, WIDTH / 2, HEIGHT * 0.49);
 
   ctx.font = '400 32px Pretendard, sans-serif';
@@ -68,9 +63,9 @@ export async function generateShareCard(payload: ShareCardPayload): Promise<Blob
   ctx.fillText('오늘의 선택은 바로 이거예요!', WIDTH / 2, HEIGHT * 0.58);
   ctx.globalAlpha = 1;
 
-  ctx.font = '700 30px Pretendard, sans-serif';
+  ctx.font = '700 28px Pretendard, sans-serif';
   ctx.globalAlpha = 0.95;
-  ctx.fillText('오늘 뭐 먹지? 🎡 결정장애 룰렛', WIDTH / 2, HEIGHT * 0.92);
+  ctx.fillText('오늘 뭐 먹지? · musa-roulette.web.app', WIDTH / 2, HEIGHT * 0.92);
   ctx.globalAlpha = 1;
 
   return new Promise((resolve) => canvas.toBlob((blob) => resolve(blob), 'image/png'));

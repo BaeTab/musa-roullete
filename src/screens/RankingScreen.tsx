@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { pageTransition, pageVariants } from '../lib/motion';
+import { ChevronLeft } from '../components/icons';
 import { fetchTopPicks, type PickStat } from '../lib/stats';
 
 interface Props {
   onBack: () => void;
 }
 
-const MEDALS = ['🥇', '🥈', '🥉'];
+function badgeClass(rank: number): string {
+  if (rank === 0) return 'rank-badge rank-badge--first';
+  if (rank === 1 || rank === 2) return 'rank-badge rank-badge--medal';
+  return 'rank-badge';
+}
 
 export default function RankingScreen({ onBack }: Props) {
   const [ranking, setRanking] = useState<PickStat[] | null>(null);
@@ -25,13 +30,14 @@ export default function RankingScreen({ onBack }: Props) {
       exit="exit"
       transition={pageTransition}
     >
-      <button type="button" className="back-btn" onClick={onBack}>
-        ← 처음으로
+      <button type="button" className="top-back" onClick={onBack} aria-label="뒤로">
+        <ChevronLeft />
       </button>
 
-      <span className="eyebrow">RANKING</span>
-      <h2 className="screen-title">🏆 인기 메뉴 랭킹</h2>
-      <p className="screen-desc">모두가 룰렛으로 가장 많이 뽑은 메뉴예요</p>
+      <div className="head">
+        <h1 className="head-title">인기 랭킹</h1>
+        <p className="head-sub">모두가 가장 많이 뽑은 메뉴예요</p>
+      </div>
 
       {ranking === null ? (
         <p className="empty-state">불러오는 중...</p>
@@ -41,8 +47,8 @@ export default function RankingScreen({ onBack }: Props) {
         <div className="pick-list">
           {ranking.map((stat, i) => (
             <div className="rank-row" key={`${stat.typeId}-${stat.categoryId}-${stat.menu}`}>
-              <span className="rank-badge">{MEDALS[i] ?? i + 1}</span>
-              <div className="pick-row-info">
+              <span className={badgeClass(i)}>{i + 1}</span>
+              <div className="pick-row-main">
                 <span className="pick-row-menu">{stat.menu}</span>
                 <span className="pick-row-meta">
                   {stat.typeName} · {stat.categoryName}

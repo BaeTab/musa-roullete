@@ -14,7 +14,8 @@ export interface PartySession {
   typeId: string;
   typeName: string;
   typeEmoji: string;
-  typeGradient: [string, string];
+  typeAccent: string;
+  typeSoft: string;
   candidates: PartyCandidate[];
   votes: Record<string, string>;
   status: 'voting' | 'done';
@@ -56,7 +57,8 @@ export async function createPartySession(type: RouletteType): Promise<string> {
     typeId: type.id,
     typeName: type.name,
     typeEmoji: type.emoji,
-    typeGradient: type.gradient,
+    typeAccent: type.accent,
+    typeSoft: type.soft,
     candidates,
     votes: {},
     status: 'voting',

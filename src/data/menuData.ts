@@ -2,7 +2,6 @@ export interface MenuCategory {
   id: string;
   name: string;
   emoji: string;
-  color: string;
   items: string[];
 }
 
@@ -11,7 +10,8 @@ export interface RouletteType {
   name: string;
   tagline: string;
   emoji: string;
-  gradient: [string, string];
+  accent: string;
+  soft: string;
   categories: MenuCategory[];
 }
 
@@ -21,13 +21,13 @@ export const ROULETTE_TYPES: RouletteType[] = [
     name: '식사',
     tagline: '든든하게 한 끼',
     emoji: '🍽️',
-    gradient: ['#E2622F', '#B33F1E'],
+    accent: '#FF6F0F',
+    soft: '#FFF3E9',
     categories: [
       {
         id: 'korean',
         name: '한식',
         emoji: '🍚',
-        color: '#E2622F',
         items: [
           '김치찌개', '된장찌개', '순두부찌개', '부대찌개', '삼겹살', '갈비탕',
           '냉면', '비빔밥', '제육볶음', '닭갈비', '보쌈', '족발',
@@ -41,7 +41,6 @@ export const ROULETTE_TYPES: RouletteType[] = [
         id: 'chinese',
         name: '중식',
         emoji: '🥢',
-        color: '#C99A2A',
         items: [
           '짜장면', '짬뽕', '탕수육', '마라탕', '마라샹궈', '양꼬치',
           '딤섬', '볶음밥', '유산슬', '물만두', '고추잡채', '마파두부',
@@ -54,7 +53,6 @@ export const ROULETTE_TYPES: RouletteType[] = [
         id: 'japanese',
         name: '일식',
         emoji: '🍣',
-        color: '#3E7C74',
         items: [
           '초밥', '라멘', '우동', '소바', '돈까스', '규동',
           '텐동', '오코노미야키', '사케동', '가라아게', '오니기리', '나베',
@@ -67,7 +65,6 @@ export const ROULETTE_TYPES: RouletteType[] = [
         id: 'western',
         name: '양식',
         emoji: '🍝',
-        color: '#7C8C4A',
         items: [
           '파스타', '피자', '스테이크', '리조또', '함박스테이크', '브런치',
           '샐러드', '스프', '오믈렛', '그라탕', '부리또볼', '버거',
@@ -80,7 +77,6 @@ export const ROULETTE_TYPES: RouletteType[] = [
         id: 'bunsik',
         name: '분식',
         emoji: '🍢',
-        color: '#D9738A',
         items: [
           '떡볶이', '김밥', '순대', '튀김', '라면', '오뎅',
           '만두', '쫄면', '라볶이', '핫도그', '계란빵', '충무김밥', '주먹밥',
@@ -92,7 +88,6 @@ export const ROULETTE_TYPES: RouletteType[] = [
         id: 'meat',
         name: '고기·구이',
         emoji: '🍖',
-        color: '#B33F1E',
         items: [
           '삼겹살', '목살', '갈비', '곱창', '막창', '치킨',
           '삼계탕', '훈제오리', '스테이크', '양꼬치', '닭발', '대창', '항정살',
@@ -104,7 +99,6 @@ export const ROULETTE_TYPES: RouletteType[] = [
         id: 'world',
         name: '세계음식',
         emoji: '🌍',
-        color: '#C97B4A',
         items: [
           '멕시코 타코', '베트남 쌀국수', '태국 팟타이', '인도 커리', '인도네시아 나시고랭',
           '터키 케밥', '스페인 감바스', '그리스 지로스', '하와이안 포케', '브라질 슈하스코',
@@ -120,13 +114,13 @@ export const ROULETTE_TYPES: RouletteType[] = [
     name: '안주',
     tagline: '한 잔엔 역시',
     emoji: '🍻',
-    gradient: ['#9C3B4A', '#6B2430'],
+    accent: '#6D5EF4',
+    soft: '#F1EFFE',
     categories: [
       {
         id: 'fried',
         name: '튀김안주',
         emoji: '🍗',
-        color: '#C99A2A',
         items: [
           '후라이드치킨', '양념치킨', '감자튀김', '오징어튀김', '새우튀김',
           '탕수육', '나쵸', '치즈스틱', '팝콘치킨', '핫윙',
@@ -138,7 +132,6 @@ export const ROULETTE_TYPES: RouletteType[] = [
         id: 'spicy',
         name: '매콤안주',
         emoji: '🌶️',
-        color: '#B33F1E',
         items: [
           '닭발', '무뼈닭발', '곱창볶음', '낙지볶음', '매운족발',
           '불막창', '매운감자탕', '쭈꾸미볶음',
@@ -149,7 +142,6 @@ export const ROULETTE_TYPES: RouletteType[] = [
         id: 'pancake',
         name: '전·부침개',
         emoji: '🥞',
-        color: '#E2933F',
         items: [
           '파전', '감자전', '두부김치', '계란말이', '김치전',
           '해물파전', '부추전', '감자채전',
@@ -160,7 +152,6 @@ export const ROULETTE_TYPES: RouletteType[] = [
         id: 'dry',
         name: '마른안주',
         emoji: '🥜',
-        color: '#6B4A32',
         items: [
           '노가리', '먹태', '육포', '땅콩', '트러플감자칩', '뻥튀기', '쥐포', '견과류믹스',
           '오징어채', '반건조오징어', '아몬드', '캐슈넛', '프레첼', '비프저키',
@@ -170,7 +161,6 @@ export const ROULETTE_TYPES: RouletteType[] = [
         id: 'dish',
         name: '안주요리',
         emoji: '🦑',
-        color: '#3E7C74',
         items: [
           '모듬회', '조개찜', '소시지야채볶음', '골뱅이소면', '낙지탕탕이',
           '문어숙회', '새우장', '마늘종햄볶음',
@@ -184,13 +174,13 @@ export const ROULETTE_TYPES: RouletteType[] = [
     name: '디저트',
     tagline: '달콤함이 필요해',
     emoji: '🍰',
-    gradient: ['#F0A04B', '#D9738A'],
+    accent: '#F04E98',
+    soft: '#FDEEF5',
     categories: [
       {
         id: 'cafe',
         name: '카페디저트',
         emoji: '🍰',
-        color: '#D9738A',
         items: [
           '케이크', '마카롱', '크로플', '타르트', '티라미수',
           '스콘', '초콜릿브라우니', '치즈케이크', '에그타르트',
@@ -201,7 +191,6 @@ export const ROULETTE_TYPES: RouletteType[] = [
         id: 'bingsu',
         name: '빙수·아이스크림',
         emoji: '🍧',
-        color: '#3E7C74',
         items: [
           '팥빙수', '망고빙수', '딸기빙수', '젤라또', '소프트아이스크림', '인절미빙수', '요거트아이스크림',
           '초코빙수', '멜론빙수', '아이스크림콘', '파르페', '셔벗',
@@ -211,7 +200,6 @@ export const ROULETTE_TYPES: RouletteType[] = [
         id: 'bakery',
         name: '베이커리·전통간식',
         emoji: '🥐',
-        color: '#E2933F',
         items: [
           '붕어빵', '호떡', '도넛', '크루아상', '약과', '인절미', '찹쌀떡', '계란빵', '와플',
           '꽈배기', '단팥빵', '소보로빵', '개성주악', '식빵', '롤케이크',
@@ -221,7 +209,6 @@ export const ROULETTE_TYPES: RouletteType[] = [
         id: 'drink',
         name: '음료',
         emoji: '🧋',
-        color: '#9C3B4A',
         items: [
           '버블티', '스무디', '프라페', '에이드', '밀크티', '아포가토', '딸기라떼', '초코라떼',
           '아이스아메리카노', '카페라떼', '자몽에이드', '레몬에이드', '콜드브루', '요거트스무디',

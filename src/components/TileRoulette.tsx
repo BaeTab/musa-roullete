@@ -1,11 +1,10 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState, type CSSProperties } from 'react';
 import { motion } from 'framer-motion';
 import './TileRoulette.css';
 
 export interface TileItem {
   id: string;
   label: string;
-  color: string;
 }
 
 export interface TileRouletteHandle {
@@ -14,6 +13,8 @@ export interface TileRouletteHandle {
 
 interface TileRouletteProps {
   items: TileItem[];
+  accent: string;
+  soft: string;
   disabled?: boolean;
   excludeIds?: string[];
   onSpinStart?: () => void;
@@ -26,7 +27,7 @@ const MAX_DELAY = 260;
 const EASE_POWER = 2.2;
 
 const TileRoulette = forwardRef<TileRouletteHandle, TileRouletteProps>(
-  ({ items, disabled, excludeIds, onSpinStart, onSpinEnd }, ref) => {
+  ({ items, accent, soft, disabled, excludeIds, onSpinStart, onSpinEnd }, ref) => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [spinning, setSpinning] = useState(false);
     const timeoutRef = useRef<number | undefined>(undefined);
@@ -65,23 +66,27 @@ const TileRoulette = forwardRef<TileRouletteHandle, TileRouletteProps>(
       },
     }));
 
-    const columns = items.length <= 9 ? 3 : 4;
-
     return (
-      <div
-        className={`tile-grid ${disabled ? 'tile-grid--disabled' : ''}`}
-        style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
-      >
+      <div className={`tile-grid ${disabled ? 'tile-grid--disabled' : ''}`}>
         {items.map((item, i) => {
           const isActive = activeIndex === i;
           const isWinner = isActive && !spinning;
           const isDim = spinning && !isActive;
+          const style: CSSProperties | undefined =
+            isActive || isWinner
+              ? {
+                  borderColor: accent,
+                  background: isWinner ? accent : soft,
+                  color: isWinner ? '#fff' : accent,
+                  ['--tile-accent' as string]: accent,
+                }
+              : undefined;
           return (
             <motion.div
               key={item.id}
               className={`tile ${isActive ? 'tile--active' : ''} ${isWinner ? 'tile--winner' : ''} ${isDim ? 'tile--dim' : ''}`}
-              style={{ borderTopColor: item.color }}
-              animate={isActive ? { scale: 1.08 } : { scale: 1 }}
+              style={style}
+              animate={isActive ? { scale: 1.04 } : { scale: 1 }}
               transition={{ duration: 0.15 }}
             >
               {item.label}
